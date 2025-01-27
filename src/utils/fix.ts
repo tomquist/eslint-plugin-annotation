@@ -1,8 +1,19 @@
+import type { TSESTree } from '@typescript-eslint/utils'
 import { Range } from '@typescript-eslint/types/dist/generated/ast-spec'
 import { SourceCode } from '@typescript-eslint/utils/dist/ts-eslint'
 
 const START = 0
 const END = 1
+
+const getRangeIncludingComments = (sourceCode: SourceCode, element: TSESTree.Node | TSESTree.Token): Range => {
+  const start = element.range[START]
+  const end = element.range[END]
+  let commentsBefore = sourceCode.getCommentsBefore(element)
+  if (commentsBefore.length === 0) {
+    return [start, end]
+  }
+  return [commentsBefore[0].range[START], end]
+}
 
 const getFixedText = (sourceCode: SourceCode, nodeRange: Range, diffRange: { from: Range; to: Range }[]) => {
   const allText = sourceCode.getText()
@@ -26,5 +37,6 @@ const getFixedText = (sourceCode: SourceCode, nodeRange: Range, diffRange: { fro
 }
 
 export const FixUtils = {
+  getRangeIncludingComments,
   getFixedText,
 }

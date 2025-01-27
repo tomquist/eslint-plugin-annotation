@@ -181,6 +181,36 @@ ruleTester.run('sort-keys', rule, {
     {
       code: `
       // @sort-keys:deep
+      const object = {
+        A1: {
+          A2: {
+            /** Comment for b */
+            b: string,
+            // Comment for a
+            a: string,
+          },
+        },
+      }
+      `,
+      errors: [{ messageId: 'hasUnsortedKeys', type: AST_NODE_TYPES.ObjectExpression }],
+      output: `
+      // @sort-keys:deep
+      const object = {
+        A1: {
+          A2: {
+            // Comment for a
+            a: string,
+            /** Comment for b */
+            b: string,
+          },
+        },
+      }
+      `,
+      filename: getFilename('main.ts'),
+    },
+    {
+      code: `
+      // @sort-keys:deep
       interface DeepMockInterface {
         B: string
         A: string

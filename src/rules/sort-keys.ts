@@ -70,8 +70,8 @@ const checkAndReport = <N extends TSESTree.Node, P extends TSESTree.Node>(
 
   if (needSort) {
     const diffRanges = ArrayUtils.zip2(properties, sortedProperties).map(([from, to]) => ({
-      from: from.range,
-      to: to.range,
+      from: FixUtils.getRangeIncludingComments(sourceCode, from!),
+      to: FixUtils.getRangeIncludingComments(sourceCode, to!),
     }))
 
     const fixedText = FixUtils.getFixedText(sourceCode, node.range, diffRanges)

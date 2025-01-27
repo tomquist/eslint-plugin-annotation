@@ -214,6 +214,40 @@ ruleTester.run('sort-keys', rule, {
     },
     {
       code: `
+      // @sort-keys
+      enum Keys {
+        /**
+         * Comment for B
+         */
+        B,
+        // Comment
+        // for
+        // C
+        C = 1,
+        /** Comment for A */
+        A,
+      }
+      `,
+      errors: [{ messageId: HAS_UNSORTED_KEYS_MESSAGE_ID, type: AST_NODE_TYPES.TSEnumDeclaration }],
+      output: `
+      // @sort-keys
+      enum Keys {
+        /** Comment for A */
+        A,
+        /**
+         * Comment for B
+         */
+        B,
+        // Comment
+        // for
+        // C
+        C = 1,
+      }
+      `,
+      filename: getFilename('main.ts'),
+    },
+    {
+      code: `
       const A = 'A'
       const B = 'B'
       // @sort-keys
@@ -313,6 +347,58 @@ ruleTester.run('sort-keys', rule, {
       }
       // @sort-keys
       const object = { [AKeys.A]: string, [AKeys.B]: string, [BKeys.A]: string, [BKeys.B]: string, }
+      `,
+      filename: getFilename('main.ts'),
+    },
+    {
+      code: `
+      enum AKeys {
+        A = 'A',
+        B = 'B',
+      }
+      enum BKeys {
+        A = 'A',
+        B = 'B',
+      }
+      // @sort-keys
+      const object = {
+        // Comment
+        [AKeys.A]: string,
+        /** Single-line block comment */
+        [BKeys.A]: string,
+        /**
+         * Multi-line block comment
+         */
+        [AKeys.B]: string,
+        // Multi-line
+        // comment
+        [BKeys.B]: string,
+      }
+      `,
+      errors: [{ messageId: HAS_UNSORTED_KEYS_MESSAGE_ID, type: AST_NODE_TYPES.ObjectExpression }],
+      output: `
+      enum AKeys {
+        A = 'A',
+        B = 'B',
+      }
+      enum BKeys {
+        A = 'A',
+        B = 'B',
+      }
+      // @sort-keys
+      const object = {
+        // Comment
+        [AKeys.A]: string,
+        /**
+         * Multi-line block comment
+         */
+        [AKeys.B]: string,
+        /** Single-line block comment */
+        [BKeys.A]: string,
+        // Multi-line
+        // comment
+        [BKeys.B]: string,
+      }
       `,
       filename: getFilename('main.ts'),
     },

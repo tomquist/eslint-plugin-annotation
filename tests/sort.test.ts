@@ -127,6 +127,36 @@ ruleTester.run('sort', rule, {
     {
       code: `
       /*
+        @sort
+      */
+      const simpleArray = [
+        // Value 2
+        2,
+        /**
+         * Value 1
+         */
+        1
+      ]
+      `,
+      errors: [{ messageId: HAS_UNSORTED_KEYS_MESSAGE_ID, type: AST_NODE_TYPES.ArrayExpression }],
+      output: `
+      /*
+        @sort
+      */
+      const simpleArray = [
+        /**
+         * Value 1
+         */
+        1,
+        // Value 2
+        2
+      ]
+      `,
+      filename: getFilename('main.ts'),
+    },
+    {
+      code: `
+      /*
         @sort:reversed
       */
       const reversedSimpleArray = [1, 2]
